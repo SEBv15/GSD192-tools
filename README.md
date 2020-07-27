@@ -15,12 +15,16 @@ Opens a simple matplotlib graph that refreshes every 10 seconds and shows the to
 
 ### `gsd192_tools.bluesky.GSD192`
 
-A class that can be instantiated and then used like a regular ophyd detector in bluesky. Some example code of how to use it:
+A class that can be instantiated and then used like a regular ophyd detector in bluesky.
 
 ```python
 from gsd192_tools.bluesky import GSD192
 
-det = GSD192(ip_addr="tcp://10.0.143.160", name="GSD192", keep_configuration=False) # default args
+det = GSD192(
+    ip_addr="tcp://10.0.143.160", # Connection string for zclient
+    name="GSD192", # Name to be used by bluesky. Just leave as default.
+    keep_configuration=False # By default, the default gsd192_tools.configure arguments are populated to the detector at instantiation. Set True to avoid that.
+)
 
 det.configure(time=5) # Set data collection time to 5 seconds (default: 60)
 det.configure(gain=2, threshold=2) # Change detector gain and threshold
