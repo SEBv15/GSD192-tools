@@ -23,7 +23,6 @@ setup(
         "numpy",
         "zmq",
     ],
-    scripts=['bin/gsd192-monitor'],
     entry_points={
         'console_scripts': ['gsd192-configure=gsd192_tools.configure:main', 'gsd192-monitor=gsd192_tools.gsd192_monitor:main'],
     }
