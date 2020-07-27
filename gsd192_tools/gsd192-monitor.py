@@ -1,10 +1,12 @@
+#!/usr/bin/env python3
+
 from gsd192_tools.zclient import zclient
 import sys
 import numpy as np
 import time
 import matplotlib.pyplot as plt
 
-if __name__ == "__main__":
+def main():
     ip_addr = "tcp://10.0.143.160"
     zc = zclient(ip_addr)
 
@@ -59,3 +61,6 @@ if __name__ == "__main__":
                 fig.canvas.draw()
                 fig.canvas.flush_events()
                 last_update = time.time()
+
+if __name__ == "__main__":
+    main()
