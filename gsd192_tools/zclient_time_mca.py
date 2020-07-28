@@ -83,7 +83,7 @@ def measure_mca_data(zc, quiet=False):
 
 def main():
     if len(sys.argv) != 3 and len(sys.argv) != 4:
-        print("Usage: python py <exposure time (sec)> <filename> [connection string]")
+        print("Usage: gsd192-time-mca <exposure time (sec)> <filename> [connection string]")
         sys.exit()
     exposureTime = int(sys.argv[1])
     filename = sys.argv[2]
