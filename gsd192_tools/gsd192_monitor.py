@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-from gsd192_tools.zclient import zclient
+from .zclient import zclient
 import sys
 import numpy as np
 import time
