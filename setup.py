@@ -21,7 +21,10 @@ setup(
     install_requires=[
         "matplotlib",
         "numpy",
-        "zmq",
+        "zmq", # zclient
+        "lmfit", # calibration
+        "dtw", # calibration
+        "pandas" # Reading in mca files
     ],
     entry_points={
         'console_scripts': ['gsd192-configure=gsd192_tools.configure:main', 'gsd192-monitor=gsd192_tools.gsd192_monitor:main'],
