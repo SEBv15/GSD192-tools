@@ -27,6 +27,10 @@ setup(
         "pandas" # Reading in mca files
     ],
     entry_points={
-        'console_scripts': ['gsd192-configure=gsd192_tools.configure:main', 'gsd192-monitor=gsd192_tools.gsd192_monitor:main'],
+        'console_scripts': [
+            'gsd192-configure=gsd192_tools.configure:main', 
+            'gsd192-monitor=gsd192_tools.gsd192_monitor:main',
+            'gsd192-time-mca=gsd192_tools.zclient_time_mca:main'
+        ],
     }
 )
