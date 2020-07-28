@@ -82,13 +82,16 @@ def measure_mca_data(zc, quiet=False):
     return mca
 
 def main():
-    if (len(sys.argv) != 3):
-        print("Usage: python py <exposure time (sec)> <filename>")
+    if len(sys.argv) != 3 and len(sys.argv) != 4:
+        print("Usage: python py <exposure time (sec)> <filename> [connection string]")
         sys.exit()
     exposureTime = int(sys.argv[1])
     filename = sys.argv[2]
 
-    ip_addr = "tcp://10.0.143.160"
+    if len(sys.argv) == 4:
+        ip_addr = sys.argv[3]
+    else:
+        ip_addr = "tcp://10.0.143.160"
     print("Starting ZClient...")
     zc = zclient(ip_addr)
     zc.read(0)
