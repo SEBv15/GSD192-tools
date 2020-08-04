@@ -23,7 +23,7 @@ setup(
         "numpy",
         "zmq", # zclient
         "lmfit", # calibration
-        "dtw", # calibration
+        "dtw-python=1.15", # calibration
         "pandas" # Reading in mca files
     ],
     entry_points={
