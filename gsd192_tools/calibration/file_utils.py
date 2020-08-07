@@ -1,9 +1,6 @@
 import pandas as pd
 import numpy as np
 
-from typing import Union, List
-from . import Strip, Strips
-
 def loadMCA(path:str) -> np.ndarray:
     """
     Load an `.mca` file into a numpy 2D array
@@ -16,6 +13,9 @@ def loadMCA(path:str) -> np.ndarray:
     """
     dataFile = pd.read_csv(path, sep='  ', header=None, skiprows=4, engine='python')
     return dataFile.values
+
+from typing import Union, List
+from . import Strip, Strips
 
 def toCalibrationFile(strips:Union[Strips, List[Strip]], name:str, units:str, sigfix=5):
     """
