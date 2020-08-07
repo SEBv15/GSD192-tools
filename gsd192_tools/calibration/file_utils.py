@@ -1,6 +1,8 @@
 import pandas as pd
 import numpy as np
 
+from typing import Union, List
+
 def loadMCA(path:str) -> np.ndarray:
     """
     Load an `.mca` file into a numpy 2D array
@@ -14,10 +16,7 @@ def loadMCA(path:str) -> np.ndarray:
     dataFile = pd.read_csv(path, sep='  ', header=None, skiprows=4, engine='python')
     return dataFile.values
 
-from typing import Union, List
-from . import Strip, Strips
-
-def toCalibrationFile(strips:Union[Strips, List[Strip]], name:str, units:str, sigfix=5):
+def toCalibrationFile(strips:'Union[Strips, List[Strip]]', name:str, units:str, sigfix=5):
     """
     Format an array of strips to a calibration file containing x values for all points in the corresponding mca file.
     :param strips: An instance of the Strips class or a list of Strip instances
@@ -52,7 +51,7 @@ def toCalibrationFile(strips:Union[Strips, List[Strip]], name:str, units:str, si
 
     return "\t#"+"\n\t#".join(headers)+"\n"+"\n".join(lines)+"\n"
 
-def toPeakFile(strips:Union[Strips, List[Strip]], name:str, units:str, x_decimals=3):
+def toPeakFile(strips:'Union[Strips, List[Strip]]', name:str, units:str, x_decimals=3):
     """
     Format an array of strips to a calibration file containing x values with known energies for all strips. This can be used to fit a custom calibration function to apply to data.
     :param strips: An instance of the Strips class or a list of Strip instances
