@@ -18,7 +18,7 @@ import time
 import json
 import copy
 
-from dtw import *
+from dtw import dtw, warp, rabinerJuangStepPattern
 
 def loadMCA(path):
     dataFile = pd.read_csv(path, sep='  ', header=None, skiprows=4, engine='python')

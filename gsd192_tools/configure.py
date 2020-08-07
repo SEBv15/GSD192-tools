@@ -126,7 +126,7 @@ def configure(gain=0, shaping=2, threshold=215, ip_addr="tcp://10.0.143.160", pr
     mars_mid = []
     for i in range(0, 12):
         word = 0
-        for j in range(0, 32):
+        for _ in range(0, 32):
             word = word << 1 | data.pop()
         mars_mid.append(word)
         
