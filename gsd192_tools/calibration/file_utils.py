@@ -2,8 +2,7 @@ import pandas as pd
 import numpy as np
 
 from typing import Union, List
-from .Strip import Strip
-from .Strips import Strips
+from . import Strip, Strips
 
 def loadMCA(path:str) -> np.ndarray:
     """
