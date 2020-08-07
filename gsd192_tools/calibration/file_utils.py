@@ -49,7 +49,7 @@ def toCalibrationFile(strips:'Union[Strips, List[Strip]]', name:str, units:str, 
     headers.append("intensity_calibration: ")
     headers.append("curve_fitted: "+("true" if curveFitted else "false"))
 
-    return "\t#"+"\n\t#".join(headers)+"\n"+"\n".join(lines)+"\n"
+    return "\t#"+"\n\t#".join(headers)+"\n"+"\n".join(lines)
 
 def toPeakFile(strips:'Union[Strips, List[Strip]]', name:str, units:str, x_decimals=3):
     """
@@ -73,7 +73,7 @@ def toPeakFile(strips:'Union[Strips, List[Strip]]', name:str, units:str, x_decim
 
     for i in range(len(strips)):
         peaks = strips[i].refined_energies if strips[i].refined_energies else strips[i].energies
-        lines[strips[i].number] = "  ".join(map(lambda peak : str(round(peak[0], x_decimals))+":"+str(peak[2]), peaks))
+        lines[strips[i].number] = "  ".join(map(lambda peak : str(round(peak[0], x_decimals))+":"+str(peak[1]), peaks))
 
     headers = []
     headers.append("name: {}".format(name))
@@ -84,7 +84,7 @@ def toPeakFile(strips:'Union[Strips, List[Strip]]', name:str, units:str, x_decim
     headers.append("intensity_calibration: ")
     headers.append("curve_fitted: "+("true" if curveFitted else "false"))
 
-    return "\t#"+"\n\t#".join(headers)+"\n"+"\n".join(lines)+"\n"
+    return "\t#"+"\n\t#".join(headers)+"\n"+"\n".join(lines)
 
 def parseCalibrationFile(data:str, peak_file:bool=False):
     """
@@ -95,7 +95,7 @@ def parseCalibrationFile(data:str, peak_file:bool=False):
         peakFile (bool): Whether it is a `.calp` file or not
     
     Returns:
-        (np.ndarray): The data
+        (dict): The data
     """
     lines = data.split("\n")
     i = 0
