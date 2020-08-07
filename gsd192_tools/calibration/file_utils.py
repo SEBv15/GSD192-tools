@@ -1,14 +1,27 @@
 import pandas as pd
 import numpy as np
 
+from typing import Union, List
+from .Strip import Strip
+from .Strips import Strips
+
 def loadMCA(path:str) -> np.ndarray:
+    """
+    Load an `.mca` file into a numpy 2D array
+
+    Parameters:
+        path (str): The path to the file
+
+    Returns:
+        (np.ndarray): The data
+    """
     dataFile = pd.read_csv(path, sep='  ', header=None, skiprows=4, engine='python')
     return dataFile.values
 
-def toCalibrationFile(pixels, name, units, isOrdered=False, sigfix=5):
+def toCalibrationFile(strips:Union[Strips, List[Strip]], name:str, units:str, sigfix=5):
     """
-    Format an array of pixels to a calibration file containing x values for all points in the corresponding mca file.
-    :param pixels: A list of pixel class instances
+    Format an array of strips to a calibration file containing x values for all points in the corresponding mca file.
+    :param strips: An instance of the Strips class or a list of Strip instances
     :param name: The name of the data
     :param units: Energy used for calibration
     :param isOrdered: If the pixels list is already in ascending order by pixel number, set this to true
@@ -16,34 +29,76 @@ def toCalibrationFile(pixels, name, units, isOrdered=False, sigfix=5):
     :returns: A string to be saved to a .cal file
     """
     curveFitted = True
-    numPixels = pixels[-1].number+1
-    for pix in pixels:
-        if pix.fitPeaks is None:
+    numPixels = 0
+    for strip in strips:
+        if strip.refined_energies is None:
             curveFitted = False
 
-        if pix.number is None and not isOrdered:
-            raise ValueError("Pixels need to know their pixel number or isOrdered needs to be true")
-
-        numPixels = max(numPixels, pix.number+1)
+        numPixels = max(numPixels, strip.number+1)
 
     lines = [""]*numPixels
 
-    for i in range(len(pixels)):
-        xdata = pixels[i].getEnergyXValues()
-        lines[i if isOrdered else pixels[i].number] = "  ".join(map(lambda x : (('%.'+str(sigfix)+'g') % x), xdata))
+    for i in range(len(strips)):
+        xdata = strips[i].calibrated_x()
+        lines[strips[i].number] = "  ".join(map(lambda x : (('%.'+str(sigfix)+'g') % x), xdata))
 
     headers = []
     headers.append("name: {}".format(name))
     headers.append("type: CAL")
     headers.append("pixels: {}".format(numPixels))
-    headers.append("channels: {}".format(len(pixels[0].data)))
+    headers.append("channels: {}".format(strips[0].data.shape[0]))
     headers.append("units: {}".format(units))
     headers.append("intensity_calibration: ")
     headers.append("curve_fitted: "+("true" if curveFitted else "false"))
 
     return "\t#"+"\n\t#".join(headers)+"\n"+"\n".join(lines)+"\n"
 
-def parseCalibrationFile(data, peakFile=False):
+def toPeakFile(strips:Union[Strips, List[Strip]], name:str, units:str, x_decimals=3):
+    """
+    Format an array of strips to a calibration file containing x values with known energies for all strips. This can be used to fit a custom calibration function to apply to data.
+    :param strips: An instance of the Strips class or a list of Strip instances
+    :param name: The name of the data
+    :param units: Energy used for calibration
+    :param isOrdered: If the pixels list is already in ascending order by pixel number, set this to true
+    :param xDecimals: The number of decimal points to include for the x location of the energy
+    :returns: A string to be saved to a .calp file
+    """
+    curveFitted = True
+    numPixels = 0
+    for strip in strips:
+        if strip.refined_energies is None:
+            curveFitted = False
+
+        numPixels = max(numPixels, strip.number+1)
+
+    lines = [""]*numPixels
+
+    for i in range(len(strips)):
+        peaks = strips[i].refined_energies if strips[i].refined_energies else strips[i].energies
+        lines[strips[i].number] = "  ".join(map(lambda peak : str(round(peak[0], x_decimals))+":"+str(peak[2]), peaks))
+
+    headers = []
+    headers.append("name: {}".format(name))
+    headers.append("type: CALP")
+    headers.append("pixels: {}".format(numPixels))
+    headers.append("channels: {}".format(strips[0].data.shape[0]))
+    headers.append("units: {}".format(units))
+    headers.append("intensity_calibration: ")
+    headers.append("curve_fitted: "+("true" if curveFitted else "false"))
+
+    return "\t#"+"\n\t#".join(headers)+"\n"+"\n".join(lines)+"\n"
+
+def parseCalibrationFile(data:str, peak_file:bool=False):
+    """
+    Parse a `.cal` or `.calp` file (the output of either `toCalibrationFile` or `toPeakFile`)
+
+    Parameters:
+        data (str): The contents of the file as string
+        peakFile (bool): Whether it is a `.calp` file or not
+    
+    Returns:
+        (np.ndarray): The data
+    """
     lines = data.split("\n")
     i = 0
     out = {}
@@ -62,45 +117,7 @@ def parseCalibrationFile(data, peakFile=False):
         if strip.strip() == "":
             data.append(None)
         else:
-            data.append(list(map(lambda x : float(x.strip()) if not peakFile else (float(x.split(":")[0].strip()), float(x.split(":")[1].strip())), strip.split("  "))))
+            data.append(list(map(lambda x : float(x.strip()) if not peak_file else (float(x.split(":")[0].strip()), float(x.split(":")[1].strip())), strip.split("  "))))
 
     out["data"] = data
     return out
-
-def toPeakFile(pixels, name, units, isOrdered=False, xDecimals=3):
-    """
-    Format an array of pixels to a calibration file containing x values with known energies for all strips. This can be used to fit a custom calibration function to apply to data.
-    :param pixels: A list of pixel class instances
-    :param name: The name of the data
-    :param units: Energy used for calibration
-    :param isOrdered: If the pixels list is already in ascending order by pixel number, set this to true
-    :param xDecimals: The number of decimal points to include for the x location of the energy
-    :returns: A string to be saved to a .calp file
-    """
-    curveFitted = True
-    numPixels = pixels[-1].number+1
-    for pix in pixels:
-        if pix.fitPeaks is None:
-            curveFitted = False
-
-        if pix.number is None and not isOrdered:
-            raise ValueError("Pixels need to know their pixel number or isOrdered needs to be true")
-
-        numPixels = max(numPixels, pix.number+1)
-
-    lines = [""]*numPixels
-
-    for i in range(len(pixels)):
-        peaks = pixels[i].getLabeledPeaks()
-        lines[i if isOrdered else pixels[i].number] = "  ".join(map(lambda peak : str(round(peak[0], xDecimals))+":"+str(peak[2]), peaks))
-
-    headers = []
-    headers.append("name: {}".format(name))
-    headers.append("type: CALP")
-    headers.append("pixels: {}".format(numPixels))
-    headers.append("channels: {}".format(len(pixels[0].data)))
-    headers.append("units: {}".format(units))
-    headers.append("intensity_calibration: ")
-    headers.append("curve_fitted: "+("true" if curveFitted else "false"))
-
-    return "\t#"+"\n\t#".join(headers)+"\n"+"\n".join(lines)+"\n"
