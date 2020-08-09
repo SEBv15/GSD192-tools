@@ -2,7 +2,7 @@
 
 ## gsd192-configure
 
-*Commandline version of the `gsd192_tools.configure` function*
+*Commandline version of the [`gsd192_tools.configure`](https://github.com/SEBv15/GSD192-tools/blob/master/gsd192_tools/configure.py) function*
 
 Allows simple configuration of detector like threshold, gain, and shaping time. To configure more parameters or define different settings for each ASIC, use the mars_config GUI.
 

@@ -21,7 +21,7 @@ strips = Strips(path="calibration-data.mca")
 ```
 The `Strips` class is basically just a list of `Strip` classes with some methods to perform bulk operations on them.
 
-Assuming data where strip `80` has peaks at `450` and `780` with energies `30` and `45` keV, to set the peak locations for the strip and dynamic time warp them to all the other you can either do
+Assuming data where strip `80` has peaks at `450` and `780` with energies `30` and `45` keV, to set the peak locations for the strip and dynamic time warp them to all the other ones, you can either do
 
 ```python
 strips.set_energies([(450, 30), (780, 45)], 80)
