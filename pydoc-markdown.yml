@@ -35,6 +35,8 @@ renderer:
       source: 'docs/commandline-scripts.md'
       preambe:
         weight: 1
+    - title: Calibration
+      source: 'docs/calibration.md'
     - title: API Documentation
       preamble:
         weight: 3
