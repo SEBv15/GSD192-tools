@@ -57,8 +57,7 @@ def toPeakFile(strips:'Union[Strips, List[Strip]]', name:str, units:str, x_decim
     :param strips: An instance of the Strips class or a list of Strip instances
     :param name: The name of the data
     :param units: Energy used for calibration
-    :param isOrdered: If the pixels list is already in ascending order by pixel number, set this to true
-    :param xDecimals: The number of decimal points to include for the x location of the energy
+    :param x_decimals: The number of decimal points to include for the x location of the energy
     :returns: A string to be saved to a .calp file
     """
     curveFitted = True
@@ -92,7 +91,7 @@ def parseCalibrationFile(data:str, peak_file:bool=False):
 
     Parameters:
         data (str): The contents of the file as string
-        peakFile (bool): Whether it is a `.calp` file or not
+        peak_file (bool): Whether it is a `.calp` file or not
     
     Returns:
         (dict): The data
