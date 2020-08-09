@@ -5,9 +5,15 @@ import sys
 import numpy as np
 import time
 import matplotlib.pyplot as plt
+from argparse import ArgumentParser
 
 def main():
-    ip_addr = "tcp://10.0.143.160"
+    parser = ArgumentParser()
+    parser.add_argument("-a", "--address", dest="ip_addr", default="tcp://10.0.143.160", type=str,
+                        help="Address of the detector. (Default: \"tcp://10.0.143.160\")")
+    args = parser.parse_args()
+
+    ip_addr = args.ip_addr
     zc = zclient(ip_addr)
 
     print("This monitor is pretty CPU intensive when a scan is running!")

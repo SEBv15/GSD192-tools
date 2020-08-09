@@ -1,0 +1,73 @@
+#@ def base_url():
+#@    if env.READTHEDOCS:
+#@      return "https://pydoc-markdown.readthedocs.io/en/" + env.READTHEDOCS_VERSION + "/"
+#@    else:
+#@      return None
+#@ end
+
+loaders:
+  - type: python
+processors:
+  - type: filter
+  - type: smart
+  - type: crossref
+renderer:
+  type: hugo
+
+  markdown:
+    source_linker:
+      type: github
+      repo: SEBv15/GSD192-tools
+
+  config:
+    baseURL: #@ base_url()
+    title: GSD192-tools
+    theme: {clone_url: "https://github.com/alex-shpak/hugo-book.git"}
+  # The "book" theme only renders pages in "content/docs" into the nav.
+  content_directory: content/docs
+  default_preamble: {menu: main}
+  pages:
+    - title: Home
+      name: index
+      source: README.md
+      directory: '..'
+    - title: Commandline Scripts
+      source: 'docs/commandline-scripts.md'
+      preambe:
+        weight: 1
+    - title: API Documentation
+      preamble:
+        weight: 3
+      children:
+        - title: zclient
+          contents:
+            - gsd192_tools.zclient.zclient.*
+          preamble:
+            weight: 1
+        - title: configure
+          contents:
+            - gsd192_tools.configure.configure
+          preamble:
+            weight: 1
+        - title: bluesky
+          children:
+            - title: GSD192
+              contents: 
+                - gsd192_tools.bluesky.GSD192
+                - gsd192_tools.bluesky.GSD192.__init__
+                - gsd192_tools.bluesky.GSD192.configure
+          preamble:
+            weight: 9
+        - title: calibration
+          children:
+            - title: Strip
+              contents: 
+                - gsd192_tools.calibration.Strip.Strip.*
+            - title: Strips
+              contents: 
+                - gsd192_tools.calibration.Strips.Strips.*
+            - title: file_utils
+              contents: 
+                - gsd192_tools.calibration.file_utils.*
+          preamble:
+            weight: 10

@@ -9,6 +9,31 @@ import matplotlib.pyplot as plt
 class Strips(Sequence):
     """
     Provides convenient functions for bulk operations on underlying Strip instances
+
+    Example:
+    ```python
+    from gsd192_tools.calibration import Strips
+
+    strips = Strips(path="gsd192-data.mca")
+    strips.set_energies(
+        [
+            (2560, 136),
+            (2290, 122),
+            (1646, 88),
+            (477, 24.9424),
+            (425, 22.16292),
+        ], 
+        80
+    ) # Calibration energies that worked for one set of data
+
+    strips.refine_energies()
+
+    strips.imshow()
+
+    # do stuff on individual strips
+    for strip in strips:
+        pass
+    ```
     """
     def __init__(self, data:np.ndarray = None, path:str = None):
         """

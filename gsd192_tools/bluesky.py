@@ -91,6 +91,23 @@ class DataCollectionThread(threading.Thread):
         self.callback(mca, done=True, time_elapsed=tm.time()-start_time, time_remaining=0)
 
 class GSD192:
+    """
+    Detector interface for bluesky. This should work exactly like an ophyd detector.
+
+    Example:
+    ```python
+    from bluesky import RunEngine
+    from bluesky.plans import count
+    from gsd192_tools.bluesky import GSD192
+
+    RE = RunEngine({})
+    
+    det = GSD192(ip_addr="tcp://10.0.143.160") # connect to detector at that IP
+    det.configure(time=60) # Set data collection time to one minute
+
+    RE(count([det])) # Collect data
+    ```
+    """
     hints = {'fields': ['total_counts']}
     """Hints for Bluesky which fields it should show in the table during data collection"""
 

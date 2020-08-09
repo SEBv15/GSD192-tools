@@ -38,9 +38,17 @@ channel_default_settings = {
     "DP0:DP3": 0
 }
 
-def configure(gain=0, shaping=2, threshold=215, ip_addr="tcp://10.0.143.160", print_data=False, zc=None):
+def configure(gain:int=0, shaping:int=2, threshold:int=215, ip_addr:str="tcp://10.0.143.160", print_data:bool=False, zc:zclient=None):
     """
     Configures the Germanium Detector.
+
+    Example:
+    ```python
+    from gsd192_tools import configure
+
+    configure(ip_addr="tcp://10.0.142.160")
+    ```
+    to write the default configuration
 
     Parameters:
         gain (int): Gain configuration number 0-3. (0:200, 1:100, 2:50, 3:25 keV)

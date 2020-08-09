@@ -18,10 +18,15 @@ class Strip:
             energies (List[Tuple[int, float]]): The energies corresponding with peaks in the data (this should only be given for one strip)
         """
         self.data = data
+        """The energy spectrum"""
         self.number = number
+        """Strip number starting from 0"""
         self.energies = None
+        """List of energy locations when set by `set_energies()` or `energies_from()`"""
         self.refined_energies = None
+        """List of refined energy locations. (None until `refine_energies()` is called)"""
         self.polynomial_coefficients = None
+        """Coefficients for the calibration polynomial from highest degree to constant term"""
         self._peaks = None
         if energies:
             self.set_energies(energies)
@@ -54,7 +59,7 @@ class Strip:
 
     @property
     def peak_prominence(self):
-        """Minimum prominence of a peak for find_peaks (log scale)"""
+        """Minimum prominence of a peak for [find_peaks](https://docs.scipy.org/doc/scipy/reference/generated/scipy.signal.find_peaks.html) (log scale)"""
         return self._peak_prominence
 
     @peak_prominence.setter
@@ -64,7 +69,7 @@ class Strip:
 
     @property
     def peak_height(self):
-        """Minimum height of a peak for find_peaks (log scale)"""
+        """Minimum height of a peak for [find_peaks](https://docs.scipy.org/doc/scipy/reference/generated/scipy.signal.find_peaks.html) (log scale)"""
         return self._peak_height
 
     @peak_height.setter
@@ -97,6 +102,9 @@ class Strip:
 
         Parameters:
             base_strip (Strip): Another strip
+
+        Returns:
+            (np.ndarray): Transformation from base_strip to this one. (Array where each index contains the corresponding index in this strip's data)
         """ 
         alignment = dtw(
             base_strip.data,
@@ -116,6 +124,9 @@ class Strip:
 
         Parameters:
             base_strip (Strip): A strip with known energies
+
+        Returns:
+            (List[Tuple[int, Any]]): List of energy locations as tuple (detector energy channel, actual energy)
         """
         if not base_strip.energies:
             raise ValueError("base_strip doesn't have any known energies")
@@ -126,9 +137,19 @@ class Strip:
 
         return self.set_energies(w_energies, ignore_error), w_energies
 
-    def refine_energies(self, frame_width:int = 20):
+    def refine_energies(self, frame_width:int = 20) -> List[Tuple[float, Any]]:
         """
-        Refine energy locations using curve fitting
+        Refine energy locations using curve fitting. For every peak in `.energies`, a small slice of the data around it is curve fitted to a gaussian and the center used as the refined energy location.
+        
+        Will set the property `.refined_energies` equal to function output
+
+        Note: The detector energy channel is a `float` here
+
+        Parameters:
+            frame_width (int): The width of the slice of data around the peak used for curve fitting
+
+        Returns:
+            (List[Tuple[float, Any]]): List of energy locations as tuple (detector energy channel, actual energy)
         """
         model = GaussianModel()
         refined = []
@@ -143,9 +164,12 @@ class Strip:
         self.polynomial_coefficients = None
         return refined
 
-    def fit_polynomial(self, max_degree:int = 7):
+    def fit_polynomial(self, max_degree:int = 7) -> List[float]:
         """
         Fit the highest degree polynomial possible with the available energy data. (0 degree is actually 1st degree with 0 shift)
+
+        Parameters:
+            max_degree (int): Max degree of polynomial to try and fit. (Max possible: 7)
 
         Returns:
             (List[Float]): The polynomial coefficients from highest degree to the constant term 
@@ -166,7 +190,7 @@ class Strip:
         self.polynomial_coefficients = list(reversed([p[1].value for p in out.params.items()]))
         return self.polynomial_coefficients
 
-    def calibrated_x(self):
+    def calibrated_x(self) -> np.ndarray:
         """
         Get x values for the data that correspond to actual energy values
 
