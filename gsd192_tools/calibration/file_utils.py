@@ -22,7 +22,6 @@ def toCalibrationFile(strips:'Union[Strips, List[Strip]]', name:str, units:str, 
     :param strips: An instance of the Strips class or a list of Strip instances
     :param name: The name of the data
     :param units: Energy used for calibration
-    :param isOrdered: If the pixels list is already in ascending order by pixel number, set this to true
     :param sigfix: The number of significant figures to round the calculated energy values to
     :returns: A string to be saved to a .cal file
     """
