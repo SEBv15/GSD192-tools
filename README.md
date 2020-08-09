@@ -1,7 +1,7 @@
 # GSD192
 Collection of python tools for the Germanium Strip Detector
 
-A more complete documentation can be found [here](https://github.com/SEBv15/GSD192-tools/wiki)
+A more complete documentation can be found [here](https://gsd192-tools.readthedocs.io/en/latest/)
 
 ## Commandline scripts
 
