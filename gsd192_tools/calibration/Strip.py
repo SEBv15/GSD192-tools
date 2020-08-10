@@ -178,7 +178,7 @@ class Strip:
         if not energies:
             raise ValueError("No known energies found for strip {}".format(self.number))
 
-        degree = min(len(energies) - 1, max_degree) if max_degree else len(energies) - 1
+        degree = min(len(energies) - 1, max_degree) if max_degree is not None else len(energies) - 1
 
         model = PolynomialModel(max(degree, 1))
         x, y = [*zip(*energies)]
