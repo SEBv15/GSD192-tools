@@ -1,6 +1,6 @@
 #@ def base_url():
 #@    if env.READTHEDOCS:
-#@      return "https://pydoc-markdown.readthedocs.io/en/" + env.READTHEDOCS_VERSION + "/"
+#@      return "https://gsd192-tools.readthedocs.io/en/" + env.READTHEDOCS_VERSION + "/"
 #@    else:
 #@      return None
 #@ end
