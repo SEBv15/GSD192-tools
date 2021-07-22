@@ -4,5 +4,5 @@ python:
   version: 3.7
   install:
   - method: pip
-    path: .
+    path: gsd192-tools
   - requirements: .readthedocs-requirements.txt
