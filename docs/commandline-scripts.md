@@ -23,3 +23,15 @@ Watches incoming data from the detector and displays a live graph that refreshes
 ```
 $ gsd192-monitor -a "tcp://10.0.143.160"
 ```
+
+## gsd192-time-mca
+
+Collects data for a given number of seconds and saves it to an `.mca` file.
+
+#### Example
+
+```
+$ gsd192-time-mca 30 30sec_count.mca "tcp://10.0.143.160"
+```
+
+*The last argument containing the IP address is optional*
