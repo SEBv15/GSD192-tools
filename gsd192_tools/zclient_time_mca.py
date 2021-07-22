@@ -106,7 +106,7 @@ def main():
     if not filename.endswith(".mca"):
         filename = filename+".mca"
 
-    fd = open(filename, 'wb')
+    fd = open(filename, 'w')
     fd.write("\t#name: {}\n".format(filename))
     fd.write("\t#type: MCA\n")
     fd.write("\t#rows: 192\n")
