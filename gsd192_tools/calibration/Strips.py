@@ -30,16 +30,20 @@ class Strips(Sequence):
 
     strips.imshow()
 
+    # Get energy value for every channel in every strip
+    energy_x_values = strips.calibrated_x()
+
     # do stuff on individual strips
     for strip in strips:
         pass
     ```
     """
-    def __init__(self, data:np.ndarray = None, path:str = None):
+    def __init__(self, data:np.ndarray = None, path:str = None, exclude_strips:List[int] = []):
         """
         Parameters:
             data (np.ndarray): A 2D array of energy spectrums for every strip (.mca format)
             path (string): Alternatively the location of the .mca file
+            exclude_strips (List[int]): Indices of broken strips to ignore
         """
         self.data = data
         if data is None and path:
@@ -47,6 +51,8 @@ class Strips(Sequence):
 
         if self.data is None:
             raise ValueError("Need data or path")
+
+        self.exclude_strips = exclude_strips
 
         self.strips = [Strip(self.data[i], i) for i in range(self.data.shape[0])]
 
@@ -60,7 +66,7 @@ class Strips(Sequence):
         """
         self.strips[strip_index].set_energies(energies)
         for strip in self.strips:
-            if not strip.number == strip_index:
+            if (not strip.number == strip_index) and strip.number not in self.exclude_strips:
                 strip.energies_from(self.strips[strip_index])
 
     def refine_energies(self, frame_width:int=20):
@@ -68,7 +74,8 @@ class Strips(Sequence):
         Refine energy locations using curve fitting
         """
         for strip in self.strips:
-            strip.refine_energies(frame_width)
+            if strip.number not in self.exclude_strips:
+                strip.refine_energies(frame_width)
 
     def fit_polynomial(self, max_degree:int = 7, uniform_degree:bool = True) -> List[List[float]]:
         """
@@ -101,7 +108,7 @@ class Strips(Sequence):
         """
         return np.asarray([strip.calibrated_x() for strip in self.strips])
 
-    def interpolate(self, xmin:float = None, xmax:float = None, step_size:float = 0.1, exclude_strips:List[int] = []) -> Tuple[np.ndarray, float, float]:
+    def interpolate(self, xmin:float = None, xmax:float = None, step_size:float = 0.1) -> Tuple[np.ndarray, float, float]:
         """
         Interpolate the data to the calibrated x values
 
@@ -109,23 +116,22 @@ class Strips(Sequence):
             xmin (float): The minimum energy for a point to be included
             xmax (float): The maximum energy for a point to be included
             step_size (float): The difference in energy between indices (Ex: 0.1 will cause indices to be 10x the actual energy value)
-            exclude_strips (List[int]): Indices of strips to exclude (set to all zeros). This can be useful if there are faulty strips.
 
         Returns:
             (List[np.ndarray, float, float]): The interpolated data, xmin, xmax
         """
         xs = np.asarray([strip.calibrated_x() for strip in self.strips])
 
-        include_mask = [i not in exclude_strips for i in range(0, len(self.strips))]
+        include_mask = [i not in self.exclude_strips for i in range(0, len(self.strips))]
         if xmin is None:
             xmin = xs[:, 0].max(where=include_mask, initial=-np.Infinity)
         if xmax is None:
             xmax = xs[:, -1].min(where=include_mask, initial=np.Infinity)
 
         x_range = np.arange(xmin, xmax, step=step_size)
-        return np.asarray([np.interp(x_range, xs[i], self.strips[i].data) if i not in exclude_strips else np.zeros(x_range.shape) for i in range(len(self.strips))]), xmin, xmax
+        return np.asarray([np.interp(x_range, xs[i], self.strips[i].data) if i not in self.exclude_strips else np.zeros(x_range.shape) for i in range(len(self.strips))]), xmin, xmax
 
-    def imshow(self, calibrated:bool = True, calibrated_units:str = "keV", log_scale:bool = True, exclude_strips:List[int] = [], *args, **kwargs):
+    def imshow(self, calibrated:bool = True, calibrated_units:str = "keV", log_scale:bool = True, *args, **kwargs):
         """
         Plot the data with matplotlib's imshow function. All extra arguments will be passed to imshow
 
@@ -141,7 +147,7 @@ class Strips(Sequence):
             else:
                 plt.ylabel("Strip number")
                 plt.xlabel("Energy ({})".format(calibrated_units))
-                data, xmin, xmax = self.interpolate(exclude_strips=exclude_strips)
+                data, xmin, xmax = self.interpolate()
                 plt.imshow(np.log10(data), extent=(xmin, xmax, len(self.strips), 0), aspect='auto', cmap='winter', interpolation='nearest', *args, **kwargs)
                 plt.show()
                 return
@@ -156,3 +162,6 @@ class Strips(Sequence):
 
     def __len__(self):
         return len(self.strips)
+
+    def __iter__(self):
+        return self.strips.__iter__()

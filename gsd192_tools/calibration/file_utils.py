@@ -3,17 +3,18 @@ import numpy as np
 
 from typing import Union, List
 
-def loadMCA(path:str) -> np.ndarray:
+def loadMCA(path:str, num_header_rows:int = 4) -> np.ndarray:
     """
     Load an `.mca` file into a numpy 2D array
 
     Parameters:
         path (str): The path to the file
+        num_header_rows (int): Number of rows to ignore
 
     Returns:
         (np.ndarray): The data
     """
-    dataFile = pd.read_csv(path, sep='  ', header=None, skiprows=4, engine='python')
+    dataFile = pd.read_csv(path, sep='  ', header=None, skiprows=num_header_rows, engine='python')
     return dataFile.values
 
 def toCalibrationFile(strips:'Union[Strips, List[Strip]]', name:str, units:str, sigfix:int=5):

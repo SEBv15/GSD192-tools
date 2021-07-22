@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='gsd192_tools',
-    version='0.1',
+    version='0.1.1',
     description='Tools for the Germanium Strip Detector',
     author='Sebastian Strempfer',
     author_email='sebastian@strempfer.com',

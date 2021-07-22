@@ -197,6 +197,9 @@ class Strip:
         Returns:
             (np.ndarray): 1D array of x values for the data
         """
+        if not self.energies:
+            return np.zeros(self.data.shape[0])
+
         if not self.polynomial_coefficients:
             self.fit_polynomial()
 
