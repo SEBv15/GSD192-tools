@@ -120,7 +120,7 @@ class Strips(Sequence):
         Returns:
             (List[np.ndarray, float, float]): The interpolated data, xmin, xmax
         """
-        xs = np.asarray([(strip.calibrated_x() if strip.number not in self.exclude_strips else []) for strip in self.strips])
+        xs = np.asarray([(strip.calibrated_x() if strip.number not in self.exclude_strips else np.zeros(strip.data.shape[0])) for strip in self.strips])
 
         include_mask = [i not in self.exclude_strips for i in range(0, len(self.strips))]
         if xmin is None:
