@@ -165,3 +165,22 @@ class Strips(Sequence):
 
     def __iter__(self):
         return self.strips.__iter__()
+
+    def sum(self, base_strip:int) -> Tuple[np.ndarray, np.ndarray]:
+        """
+        Sum the calibrated strips using one strip's energy bins as x-axis. This uses .interpolated_to for each strip.
+
+        Parameters:
+            base_strip (int): The index of the base strip which determines the energy bins
+
+        Returns:
+            (Tuple[np.ndarray[float], np.ndarray[float]]): The energy bins (x-axis) and the counts at each energy (y-axis)
+        """
+        y = np.copy(self[base_strip].data)
+        x = self[base_strip].calibrated_x()
+
+        for i in range(len(self)):
+            if i != base_strip:
+                y += self[i].interpolated_to(x)
+
+        return (x, y)

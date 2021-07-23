@@ -204,3 +204,41 @@ class Strip:
             self.fit_polynomial()
 
         return np.polyval(self.polynomial_coefficients, np.arange(0, self.data.shape[0]))
+
+    def interpolated_to(self, x:np.ndarray) -> np.ndarray:
+        """
+        Interpolate the data to match the given energy bins while preserving counts over any energy range.
+        This is done by interpreting the energy values of the strip as bins and distributing the counts in them
+        to the given energy range by calculating the overlap between each bin in this strip and each target bin.
+
+        Parameters:
+            x (np.ndarray[float]): The energy bins to rearrange the counts for
+
+        Returns:
+            (np.ndarray[float]): The counts rearranged to match the input energy bins
+        """
+        this_x = self.calibrated_x()
+
+        y = np.zeros(x.shape[0], dtype=float)
+
+        # Minimum position in the output where the counts could be distributed to
+        min_idx = 0
+
+        # Go through all elements in our data and distribute their counts to the target bins
+        for i in range(this_x.shape[0]):
+            # Calculate the bin width of the current bin we are trying to distribute
+            this_step = this_x[i + 1] - this_x[i] if i + 1 < this_x.shape[0] else this_x[i] - this_x[i - 1]
+
+            # Advance the minimum position to the minimum target bin that overlaps the current source bin
+            while min_idx + 1 < x.shape[0] and x[min_idx + 1] < this_x[i]:
+                min_idx += 1
+
+            # Go through all the target bins that overlap the source bin and distribute the counts by overlap area
+            j = min_idx
+            while j < x.shape[0] and x[j] < this_x[i] + this_step:
+                step = x[j + 1] - x[j] if j + 1 < x.shape[0] else x[j] - x[j - 1]
+                overlap = min(x[j] + step, this_x[i] + this_step) - max(x[j], this_x[i])
+                y[j] += self.data[i] * overlap / this_step
+                j += 1
+        
+        return y
