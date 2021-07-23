@@ -237,7 +237,7 @@ class Strip:
             j = min_idx
             while j < x.shape[0] and x[j] < this_x[i] + this_step:
                 step = x[j + 1] - x[j] if j + 1 < x.shape[0] else x[j] - x[j - 1]
-                overlap = min(x[j] + step, this_x[i] + this_step) - max(x[j], this_x[i])
+                overlap = max(0, min(x[j] + step, this_x[i] + this_step) - max(x[j], this_x[i]))
                 y[j] += self.data[i] * overlap / this_step
                 j += 1
         
