@@ -75,7 +75,8 @@ class DataCollectionThread(threading.Thread):
         while True:
             [address, msg] = self.zc.data_sock.recv_multipart()
             if (address == zclient.TOPIC_META):
-                break
+                if tm.time() - start_time > self.duration - 10: # Only end if we are 10 seconds from the end (ugly fix)
+                    break
             if (address == zclient.TOPIC_DATA):
                 data = np.frombuffer(msg, dtype=np.uint32)
                 for x in data[::2]:
@@ -87,6 +88,9 @@ class DataCollectionThread(threading.Thread):
                 if tm.time() - last_update > self.update_interval and self.update_interval >= 0:
                     last_update = tm.time()
                     self.callback(mca, time_elapsed=tm.time()-start_time, time_remaining=self.duration - (tm.time()-start_time))
+                    
+            if tm.time() - start_time > self.duration + 10: # Break if the detector doesn't send an end signal (ugly fix)
+                break
 
         self.callback(mca, done=True, time_elapsed=tm.time()-start_time, time_remaining=0)
 
